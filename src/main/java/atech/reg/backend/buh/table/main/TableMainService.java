@@ -18,6 +18,7 @@ import atech.reg.backend.buh.dropdown.data.BuhDropdownMarkEntity;
 import atech.reg.backend.buh.dropdown.data.BuhDropdownStatusEntity;
 import atech.reg.backend.buh.initiator.InitiatorService;
 import jakarta.servlet.http.HttpSession;
+import java.util.Calendar;
 
 @Service
 public class TableMainService {
@@ -48,11 +49,16 @@ public class TableMainService {
 
     public List<TableMainEntity> getAll(String data) {
         try {
-            System.out.println("\n\n\nINPUTARRAY:\n" + data);
             JsonNode json = objectMapper.readTree(data);
 
             Date inputDateFrom = tools.stringToDate(json.get("inputDate").get("from").asText());
             Date inputDateTo = tools.stringToDate(json.get("inputDate").get("to").asText());
+
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(inputDateTo);
+            cal.add(Calendar.DAY_OF_MONTH, 1);
+            Date inputDateToPlusOne = cal.getTime();
+
             List<Long> contractorIds = objectMapper.convertValue(json.get("contractor"),
                     new TypeReference<List<Long>>() {
                     });
@@ -87,30 +93,10 @@ public class TableMainService {
             if (statusIds.size() == 0)
                 statusIds = ddService.getAllIds("status");
 
-            StringBuilder sb = new StringBuilder("\n\n\nRECIEVED DATA:\n");
-            sb.append("inputDateFrom: ").append(inputDateFrom).append("\n");
-            sb.append("inputDateTo: ").append(inputDateTo).append("\n");
-            sb.append("contractor: ").append(contractorIds).append("\n");
-            sb.append("initiator: ").append(initiatorIds).append("\n");
-            sb.append("destination: ").append(destination).append("\n");
-            sb.append("sumFrom: ").append(sumFrom).append("\n");
-            sb.append("sumTo: ").append(sumTo).append("\n");
-            sb.append("sumClosingFrom: ").append(sumClosingFrom).append("\n");
-            sb.append("sumClosingTo: ").append(sumClosingTo).append("\n");
-            sb.append("copyDateFrom: ").append(copyDateFrom).append("\n");
-            sb.append("copyDateTo: ").append(copyDateTo).append("\n");
-            sb.append("copyDateNull: ").append(copyDateNull).append("\n");
-            sb.append("origDateFrom: ").append(origDateFrom).append("\n");
-            sb.append("origDateTo: ").append(origDateTo).append("\n");
-            sb.append("origDateNull: ").append(origDateNull).append("\n");
-            sb.append("title: ").append(title).append("\n");
-            sb.append("about: ").append(aboutIds).append("\n");
-            sb.append("mark: ").append(markIds).append("\n");
-            sb.append("status: ").append(statusIds).append("\n");
-            System.out.println(sb.toString());
+            System.out.println(555);
 
             return repo.getFilteredTest(
-                    inputDateFrom, inputDateTo,
+                    inputDateFrom, inputDateToPlusOne,
                     contractorIds,
                     initiatorIds,
                     destination,
